@@ -16,9 +16,11 @@ load_dotenv()
 app = FastAPI(title="会議議事録生成API", version="1.0.0")
 
 # CORS設定
+# 環境変数から許可するオリジンを取得（デプロイ時用）
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Mic, Image, FileText, Loader2, Download, Sparkles } from 'lucide-react'
 import axios from 'axios'
 
+// APIのベースURLを環境変数から取得（デプロイ時用）
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+
 interface ActionItem {
   task: string
   assignee: string
@@ -40,7 +43,7 @@ function App() {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await axios.post('/api/transcribe', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/transcribe`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
@@ -64,7 +67,7 @@ function App() {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await axios.post('/api/analyze-image', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/analyze-image`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
@@ -86,7 +89,7 @@ function App() {
     setLoading(true)
 
     try {
-      const response = await axios.post('/api/generate-minutes', {
+      const response = await axios.post(`${API_BASE_URL}/api/generate-minutes`, {
         audio_transcript: transcript,
         image_analysis: imageAnalysis,
         text_input: textInput,
