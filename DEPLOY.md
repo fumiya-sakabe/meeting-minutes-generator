@@ -2,7 +2,15 @@
 
 このアプリケーションを本番環境にデプロイする手順です。デフォルトの自動生成URLを使用します（カスタムドメイン設定不要）。
 
-## デプロイ構成
+## デプロイ方法の選択
+
+### 方法1: Render（推奨 - 完全無料プランあり）
+→ [DEPLOY_RENDER.md](./DEPLOY_RENDER.md) を参照してください
+
+### 方法2: Railway + Vercel
+以下の手順を参照してください
+
+## デプロイ構成（Railway + Vercel）
 
 - **フロントエンド**: Vercel（自動生成URL: `https://xxx.vercel.app`）
 - **バックエンド**: Railway（自動生成URL: `https://xxx.railway.app`）
