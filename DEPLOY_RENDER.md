@@ -40,7 +40,7 @@
 「Environment Variables」セクションで以下を追加：
 
 ```
-OPENAI_API_KEY=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
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 **注意**: `ALLOWED_ORIGINS` は後で設定します（フロントエンドのURLが確定してから）
