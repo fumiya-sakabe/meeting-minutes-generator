@@ -205,15 +205,11 @@ async def generate_minutes(request: MeetingRequest):
         # 感情分析
         sentiment = analyze_sentiment(combined_input)
         
-        # 会議の質の分析
-        quality_analysis = analyze_meeting_quality(combined_input, minutes, action_items)
-        
         return {
             "minutes": minutes,
             "action_items": action_items,
             "summary": summary,
-            "sentiment": sentiment,
-            "quality_analysis": quality_analysis
+            "sentiment": sentiment
         }
     except Exception as e:
         import traceback
@@ -358,105 +354,6 @@ def analyze_sentiment(text: str) -> dict:
         return {"positive": 50, "negative": 50, "neutral": 50}
 
 
-def analyze_meeting_quality(combined_input: str, minutes: str, action_items: List[dict]) -> dict:
-    """会議の質を分析"""
-    try:
-        prompt = f"""以下の会議内容と議事録を分析し、会議の質を評価してください。
-
-【会議内容】
-{combined_input}
-
-【議事録】
-{minutes}
-
-【アクションアイテム数】
-{len(action_items)}個
-
-以下の観点で0-100点で評価し、JSON形式で返してください：
-1. efficiency: 会議の効率性（時間対効果、無駄な議論がないか）
-2. decision_clarity: 決定事項の明確さ（何が決定されたか明確か）
-3. action_specificity: アクションアイテムの具体性（タスク、担当者、期限が明確か）
-4. participation_balance: 参加者の発言バランス（特定の人だけが話していないか）
-5. discussion_depth: 議論の深さ（表面的でない、建設的な議論ができているか）
-6. overall_score: 総合スコア（上記5項目の平均）
-
-各項目は0-100の整数で、改善提案も含めてください。
-
-以下のJSON形式で返してください：
-{{
-  "scores": {{
-    "efficiency": 数値,
-    "decision_clarity": 数値,
-    "action_specificity": 数値,
-    "participation_balance": 数値,
-    "discussion_depth": 数値,
-    "overall_score": 数値
-  }},
-  "recommendations": [
-    "改善提案1",
-    "改善提案2",
-    "改善提案3"
-  ],
-  "strengths": [
-    "良い点1",
-    "良い点2"
-  ]
-}}
-"""
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4-turbo-preview",
-                messages=[
-                    {"role": "system", "content": "あなたは会議の質を評価する専門家です。会議の効率性、決定事項の明確さ、アクションアイテムの具体性、参加者の発言バランス、議論の深さを多角的に評価します。"},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.2,
-                response_format={"type": "json_object"}
-            )
-        except Exception as e:
-            if "gpt-4" in str(e).lower() or "model" in str(e).lower():
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "あなたは会議の質を評価する専門家です。会議の効率性、決定事項の明確さ、アクションアイテムの具体性、参加者の発言バランス、議論の深さを多角的に評価します。"},
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.2,
-                    response_format={"type": "json_object"}
-                )
-            else:
-                raise
-        
-        result = json.loads(response.choices[0].message.content)
-        
-        # デフォルト値の確保
-        scores = result.get("scores", {})
-        return {
-            "scores": {
-                "efficiency": scores.get("efficiency", 50),
-                "decision_clarity": scores.get("decision_clarity", 50),
-                "action_specificity": scores.get("action_specificity", 50),
-                "participation_balance": scores.get("participation_balance", 50),
-                "discussion_depth": scores.get("discussion_depth", 50),
-                "overall_score": scores.get("overall_score", 50)
-            },
-            "recommendations": result.get("recommendations", []),
-            "strengths": result.get("strengths", [])
-        }
-    except Exception as e:
-        print(f"会議の質分析エラー: {e}")
-        return {
-            "scores": {
-                "efficiency": 50,
-                "decision_clarity": 50,
-                "action_specificity": 50,
-                "participation_balance": 50,
-                "discussion_depth": 50,
-                "overall_score": 50
-            },
-            "recommendations": ["分析に失敗しました"],
-            "strengths": []
-        }
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Mic, Image, FileText, Loader2, Download, Sparkles, TrendingUp } from 'lucide-react'
+import { Mic, Image, FileText, Loader2, Download, Sparkles } from 'lucide-react'
 import axios from 'axios'
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts'
 
 // APIのベースURLを環境変数から取得（デプロイ時用）
 const API_BASE_URL = import.meta.env.VITE_API_URL || ''
@@ -13,15 +12,6 @@ interface ActionItem {
   priority: string
 }
 
-interface QualityScores {
-  efficiency: number
-  decision_clarity: number
-  action_specificity: number
-  participation_balance: number
-  discussion_depth: number
-  overall_score: number
-}
-
 interface MeetingResult {
   minutes: string
   action_items: ActionItem[]
@@ -30,11 +20,6 @@ interface MeetingResult {
     positive: number
     negative: number
     neutral: number
-  }
-  quality_analysis?: {
-    scores: QualityScores
-    recommendations: string[]
-    strengths: string[]
   }
 }
 
@@ -242,163 +227,6 @@ function App() {
                     {result.summary}
                   </div>
                 </div>
-
-                {/* 会議の質の分析 */}
-                {result.quality_analysis && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-indigo-600" />
-                      会議の質の分析
-                    </h3>
-                    <div className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg">
-                      {/* 総合スコア */}
-                      <div className="text-center mb-4">
-                        <div className="text-4xl font-bold text-indigo-600 mb-1">
-                          {result.quality_analysis.scores.overall_score}
-                        </div>
-                        <div className="text-sm text-gray-600">総合スコア / 100点</div>
-                      </div>
-
-                      {/* レーダーチャート */}
-                      <div className="mb-4" style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RadarChart data={[
-                            {
-                              category: '効率性',
-                              score: result.quality_analysis.scores.efficiency,
-                              fullMark: 100
-                            },
-                            {
-                              category: '決定事項の明確さ',
-                              score: result.quality_analysis.scores.decision_clarity,
-                              fullMark: 100
-                            },
-                            {
-                              category: 'アクションの具体性',
-                              score: result.quality_analysis.scores.action_specificity,
-                              fullMark: 100
-                            },
-                            {
-                              category: '発言バランス',
-                              score: result.quality_analysis.scores.participation_balance,
-                              fullMark: 100
-                            },
-                            {
-                              category: '議論の深さ',
-                              score: result.quality_analysis.scores.discussion_depth,
-                              fullMark: 100
-                            }
-                          ]}>
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="category" tick={{ fontSize: 12 }} />
-                            <PolarRadiusAxis angle={90} domain={[0, 100]} />
-                            <Radar
-                              name="スコア"
-                              dataKey="score"
-                              stroke="#4f46e5"
-                              fill="#818cf8"
-                              fillOpacity={0.6}
-                            />
-                          </RadarChart>
-                        </ResponsiveContainer>
-                      </div>
-
-                      {/* 詳細スコア */}
-                      <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div className="text-sm">
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-600">効率性</span>
-                            <span className="font-semibold">{result.quality_analysis.scores.efficiency}点</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-indigo-500 h-1.5 rounded-full"
-                              style={{ width: `${result.quality_analysis.scores.efficiency}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-sm">
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-600">決定事項の明確さ</span>
-                            <span className="font-semibold">{result.quality_analysis.scores.decision_clarity}点</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-indigo-500 h-1.5 rounded-full"
-                              style={{ width: `${result.quality_analysis.scores.decision_clarity}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-sm">
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-600">アクションの具体性</span>
-                            <span className="font-semibold">{result.quality_analysis.scores.action_specificity}点</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-indigo-500 h-1.5 rounded-full"
-                              style={{ width: `${result.quality_analysis.scores.action_specificity}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-sm">
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-600">発言バランス</span>
-                            <span className="font-semibold">{result.quality_analysis.scores.participation_balance}点</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-indigo-500 h-1.5 rounded-full"
-                              style={{ width: `${result.quality_analysis.scores.participation_balance}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-sm col-span-2">
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-600">議論の深さ</span>
-                            <span className="font-semibold">{result.quality_analysis.scores.discussion_depth}点</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-indigo-500 h-1.5 rounded-full"
-                              style={{ width: `${result.quality_analysis.scores.discussion_depth}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 良い点 */}
-                      {result.quality_analysis.strengths.length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">✨ 良い点</h4>
-                          <ul className="space-y-1">
-                            {result.quality_analysis.strengths.map((strength, index) => (
-                              <li key={index} className="text-sm text-gray-700 flex items-start">
-                                <span className="text-green-500 mr-2">✓</span>
-                                {strength}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* 改善提案 */}
-                      {result.quality_analysis.recommendations.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">💡 改善提案</h4>
-                          <ul className="space-y-1">
-                            {result.quality_analysis.recommendations.map((rec, index) => (
-                              <li key={index} className="text-sm text-gray-700 flex items-start">
-                                <span className="text-blue-500 mr-2">→</span>
-                                {rec}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 {/* 感情分析 */}
                 <div>
