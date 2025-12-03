@@ -39,8 +39,6 @@ interface MeetingResult {
 }
 
 function App() {
-  const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [imageFile, setImageFile] = useState<File | null>(null)
   const [textInput, setTextInput] = useState('')
   const [transcript, setTranscript] = useState('')
   const [imageAnalysis, setImageAnalysis] = useState('')
@@ -51,7 +49,6 @@ function App() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setAudioFile(file)
     setLoading(true)
 
     try {
@@ -75,7 +72,6 @@ function App() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setImageFile(file)
     setLoading(true)
 
     try {
